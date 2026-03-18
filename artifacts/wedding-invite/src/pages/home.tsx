@@ -1,6 +1,30 @@
 import { motion } from "framer-motion";
-import { CalendarDays, MapPin, Clock } from "lucide-react";
+import { CalendarDays, MapPin, Clock, Download } from "lucide-react";
 import RsvpForm from "@/components/rsvp-form";
+
+async function exportRsvpCsv() {
+  const response = await fetch(`${import.meta.env.BASE_URL}api/rsvp`.replace(/\/+/g, "/").replace(":/", "://"));
+  const data = await response.json();
+  if (!Array.isArray(data) || data.length === 0) {
+    alert("Nenhuma confirmação encontrada ainda.");
+    return;
+  }
+  const headers = ["Nome", "WhatsApp", "Acompanhantes", "Data de Confirmação"];
+  const rows = data.map((r: any) => [
+    `"${(r.guestName ?? "").replace(/"/g, '""')}"`,
+    `"${(r.whatsapp ?? "").replace(/"/g, '""')}"`,
+    `"${(r.companions ?? "").replace(/"/g, '""')}"`,
+    `"${r.createdAt ? new Date(r.createdAt).toLocaleString("pt-BR") : ""}"`,
+  ]);
+  const csv = [headers.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "confirmacoes-casamento-leonan-stephani.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 // Helper components for animation
 const FadeIn = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) => (
@@ -136,6 +160,15 @@ export default function Home() {
         <footer className="w-full text-center mt-20 pt-10 border-t border-primary/20">
           <p className="font-script text-4xl text-foreground/80 mb-2">Leonan & Stephani</p>
           <p className="font-sans text-xs tracking-widest text-muted-foreground uppercase">28.11.2026</p>
+          <div className="mt-8">
+            <button
+              onClick={exportRsvpCsv}
+              className="inline-flex items-center gap-2 text-xs text-muted-foreground/60 hover:text-primary transition-colors duration-300 font-sans tracking-widest uppercase border border-muted-foreground/20 hover:border-primary/40 rounded-full px-4 py-2"
+            >
+              <Download className="w-3 h-3" />
+              Exportar confirmações (.csv)
+            </button>
+          </div>
         </footer>
 
       </div>
