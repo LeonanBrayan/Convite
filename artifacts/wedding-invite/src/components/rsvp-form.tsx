@@ -35,8 +35,8 @@ export default function RsvpForm() {
   const onSubmit = async (data: FormValues) => {
     try {
       await submitRsvpMutation.mutateAsync({ data });
-      setIsSubmitted(true);
       reset();
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Failed to submit RSVP:", error);
     }
