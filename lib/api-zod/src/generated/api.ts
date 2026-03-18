@@ -14,3 +14,29 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Submit a guest RSVP for the wedding
+ * @summary Submit RSVP
+ */
+export const SubmitRsvpBody = zod.object({
+  guestName: zod.string().describe("Name of the guest"),
+  whatsapp: zod.string().describe("WhatsApp number"),
+  companions: zod
+    .string()
+    .optional()
+    .describe("Names of companions (comma-separated or free text)"),
+});
+
+/**
+ * Returns all RSVPs
+ * @summary List all RSVPs
+ */
+export const ListRsvpsResponseItem = zod.object({
+  id: zod.number(),
+  guestName: zod.string(),
+  whatsapp: zod.string(),
+  companions: zod.string().nullish(),
+  createdAt: zod.date(),
+});
+export const ListRsvpsResponse = zod.array(ListRsvpsResponseItem);

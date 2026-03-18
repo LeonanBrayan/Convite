@@ -1,0 +1,21 @@
+packages:
+  "framer-motion": "For elegant scroll animations, fades, and interactive transitions"
+  "react-hook-form": "For robust and performant RSVP form handling"
+  "@hookform/resolvers": "For Zod schema validation integration with react-hook-form"
+  "canvas-confetti": "For a delightful celebration effect upon successful RSVP submission"
+  "@types/canvas-confetti": "TypeScript definitions for canvas-confetti"
+
+images:
+  - path: "artifacts/wedding-invite/public/images/watercolor-bg.png"
+    description: "Soft romantic powder blue and cream watercolor abstract background, elegant, light, subtle, perfect for a luxury Bridgerton style wedding invitation"
+    aspect_ratio: "16:9"
+  - path: "artifacts/wedding-invite/public/images/floral-corner.png"
+    description: "Vintage Bridgerton style floral arrangement with white roses, light powder blue hydrangeas and subtle gold leaves, isolated on white background"
+    aspect_ratio: "1:1"
+  - path: "artifacts/wedding-invite/public/images/gold-ornament.png"
+    description: "Elegant vintage gold filigree divider ornament, symmetrical, regency era style, on transparent background"
+    aspect_ratio: "16:9"
+
+notes:
+  - "Importing pre-generated React Query hooks from @workspace/api-client-react as specified in implementation notes"
+  - "Styling uses custom Bridgerton-inspired palette (powder blue, champagne gold, deep navy)"

@@ -5,18 +5,26 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  CreateRsvp,
+  ErrorResponse,
+  HealthStatus,
+  Rsvp,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -92,6 +100,159 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Submit a guest RSVP for the wedding
+ * @summary Submit RSVP
+ */
+export const getSubmitRsvpUrl = () => {
+  return `/api/rsvp`;
+};
+
+export const submitRsvp = async (
+  createRsvp: CreateRsvp,
+  options?: RequestInit,
+): Promise<Rsvp> => {
+  return customFetch<Rsvp>(getSubmitRsvpUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createRsvp),
+  });
+};
+
+export const getSubmitRsvpMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitRsvp>>,
+    TError,
+    { data: BodyType<CreateRsvp> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitRsvp>>,
+  TError,
+  { data: BodyType<CreateRsvp> },
+  TContext
+> => {
+  const mutationKey = ["submitRsvp"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitRsvp>>,
+    { data: BodyType<CreateRsvp> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return submitRsvp(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitRsvpMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitRsvp>>
+>;
+export type SubmitRsvpMutationBody = BodyType<CreateRsvp>;
+export type SubmitRsvpMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Submit RSVP
+ */
+export const useSubmitRsvp = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitRsvp>>,
+    TError,
+    { data: BodyType<CreateRsvp> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof submitRsvp>>,
+  TError,
+  { data: BodyType<CreateRsvp> },
+  TContext
+> => {
+  return useMutation(getSubmitRsvpMutationOptions(options));
+};
+
+/**
+ * Returns all RSVPs
+ * @summary List all RSVPs
+ */
+export const getListRsvpsUrl = () => {
+  return `/api/rsvp`;
+};
+
+export const listRsvps = async (options?: RequestInit): Promise<Rsvp[]> => {
+  return customFetch<Rsvp[]>(getListRsvpsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListRsvpsQueryKey = () => {
+  return [`/api/rsvp`] as const;
+};
+
+export const getListRsvpsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listRsvps>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof listRsvps>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListRsvpsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listRsvps>>> = ({
+    signal,
+  }) => listRsvps({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listRsvps>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListRsvpsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listRsvps>>
+>;
+export type ListRsvpsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all RSVPs
+ */
+
+export function useListRsvps<
+  TData = Awaited<ReturnType<typeof listRsvps>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof listRsvps>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListRsvpsQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

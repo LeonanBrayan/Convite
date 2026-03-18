@@ -5,9 +5,6 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
 
 export interface CreateRsvp {
   /** Name of the guest */
@@ -16,16 +13,4 @@ export interface CreateRsvp {
   whatsapp: string;
   /** Names of companions (comma-separated or free text) */
   companions?: string;
-}
-
-export interface Rsvp {
-  id: number;
-  guestName: string;
-  whatsapp: string;
-  companions?: string | null;
-  createdAt: string;
-}
-
-export interface ErrorResponse {
-  error: string;
 }

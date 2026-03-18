@@ -1,6 +1,5 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
   description: API specification
@@ -10,6 +9,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: rsvp
+    description: RSVP operations
 paths:
   /healthz:
     get:
@@ -24,6 +25,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /rsvp:
+    post:
+      operationId: submitRsvp
+      tags: [rsvp]
+      summary: Submit RSVP
+      description: Submit a guest RSVP for the wedding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRsvp"
+      responses:
+        "201":
+          description: RSVP submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rsvp"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      operationId: listRsvps
+      tags: [rsvp]
+      summary: List all RSVPs
+      description: Returns all RSVPs
+      responses:
+        "200":
+          description: List of RSVPs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Rsvp"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +73,45 @@ components:
           type: string
       required:
         - status
-
+    CreateRsvp:
+      type: object
+      properties:
+        guestName:
+          type: string
+          description: Name of the guest
+        whatsapp:
+          type: string
+          description: WhatsApp number
+        companions:
+          type: string
+          description: Names of companions (comma-separated or free text)
+      required:
+        - guestName
+        - whatsapp
+    Rsvp:
+      type: object
+      properties:
+        id:
+          type: integer
+        guestName:
+          type: string
+        whatsapp:
+          type: string
+        companions:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - guestName
+        - whatsapp
+        - createdAt
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

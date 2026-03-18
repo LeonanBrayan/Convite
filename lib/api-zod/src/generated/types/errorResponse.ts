@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export * from "./createRsvp";
-export * from "./errorResponse";
-export * from "./healthStatus";
-export * from "./rsvp";
+export interface ErrorResponse {
+  error: string;
+}
